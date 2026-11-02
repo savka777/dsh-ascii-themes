@@ -46,7 +46,9 @@ Previews from the running app: [whale](preview/app-whale.png) ·
 
 ## Repo usage
 
-This folder is the canonical checkout and is ready for git. Clone it, then:
+This folder is the canonical checkout — `~/Desktop/dsh-ascii-themes`, a git repo.
+In the Harness workspace, `plugins/dsh-ascii-themes` is a symlink to this folder,
+so agents editing either path change this same copy. Clone it, then:
 
 ```sh
 node scripts/build.mjs       # rebuild dist/ and preview.html
