@@ -1,0 +1,5 @@
+# Generated bundle patch: inserts the ASCII themes plugin row.
+- insert:
+    - id: ascii-themes
+      name: '@local/dsh-ascii-themes'
+      config: {}

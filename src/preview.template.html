@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCII themes preview</title>
+<style>
+	:root { color-scheme: dark; }
+	html, body { margin: 0; min-height: 100%; }
+	body { background: #0d0e12; color: #e8eaf0; font: 14px ui-sans-serif, system-ui, -apple-system, sans-serif; padding: 26px; }
+	body.light { background: #f5f6f9; color: #16181f; color-scheme: light; }
+	h1 { font-size: 15px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin: 0 0 4px; }
+	p.sub { margin: 0 0 22px; font-size: 12px; opacity: .42; }
+	.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+	.card { display: flex; flex-direction: column; gap: 8px; }
+	.frame { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #151517; border: 1px solid rgba(255,255,255,.1); }
+	body.light .frame { background: #fff; border-color: rgba(0,0,0,.1); }
+	.frame canvas { display: block; width: 100%; height: 100%; mix-blend-mode: plus-lighter; }
+	body.light .frame canvas { mix-blend-mode: multiply; }
+	.label { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+	.dot { width: 8px; height: 8px; border-radius: 99px; box-shadow: 0 0 10px currentColor; background: currentColor; }
+	.label small { opacity: .4; font-family: ui-monospace, monospace; font-size: 10px; margin-left: auto; }
+	.single { position: fixed; inset: 0; }
+	.single canvas { display: block; width: 100%; height: 100%; mix-blend-mode: plus-lighter; }
+	body.light .single canvas { mix-blend-mode: multiply; }
+	.badge { position: fixed; right: 14px; top: 12px; font: 11px ui-monospace, monospace; opacity: .4; z-index: 5; }
+</style>
+</head>
+<body data-ds-dark-theme>
+<h1 id="title">ASCII themes</h1>
+<p class="sub" id="sub">animated scene gallery · dark palette · add ?light, or ?single=&lt;id&gt; for fullscreen</p>
+<div class="grid" id="grid"></div>
+<div class="badge" id="badge"></div>
+<script type="module">
+	const params = new URLSearchParams(location.search);
+	const light = params.has("light");
+	if (light) { document.body.classList.add("light"); document.body.removeAttribute("data-ds-dark-theme"); }
+	const single = params.get("single");
+
+	__THEME_SCENES__
+
+	__THEME_RENDERER__
+
+	const grid = document.getElementById("grid");
+	const singleMode = single && THEMES.some((theme) => theme.id === single);
+
+	if (singleMode) {
+		const holder = document.createElement("div");
+		holder.className = "single";
+		const canvas = document.createElement("canvas");
+		holder.append(canvas);
+		document.body.append(holder);
+		grid.remove();
+		document.getElementById("title").remove();
+		document.getElementById("sub").remove();
+		mountScene(canvas, { theme: single, fps: 10 });
+		document.getElementById("badge").textContent = `${single} · ${light ? "light" : "dark"}`;
+	} else {
+		for (const theme of THEMES) {
+			const card = document.createElement("div");
+			card.className = "card";
+			const frame = document.createElement("div");
+			frame.className = "frame";
+			const canvas = document.createElement("canvas");
+			frame.append(canvas);
+			const label = document.createElement("div");
+			label.className = "label";
+			label.style.color = theme.accent;
+			const dot = document.createElement("span");
+			dot.className = "dot";
+			const name = document.createElement("span");
+			name.style.color = "inherit";
+			name.style.color = "";
+			name.textContent = theme.title;
+			name.style.color = "var(--label-color, inherit)";
+			const id = document.createElement("small");
+			id.textContent = theme.id;
+			label.append(dot, name, id);
+			card.append(frame, label);
+			grid.append(card);
+			mountScene(canvas, { theme: theme.id, fps: 8, scale: 3, dpr: 1 });
+		}
+		document.getElementById("badge").textContent = `${THEMES.length} themes · ${light ? "light" : "dark"}`;
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "dsh-ascii-themes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Animated ASCII theme gallery backdrop plugin for DeepSeek Harness",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "install-plugin": "node scripts/install.mjs",
+    "remove-plugin": "node scripts/install.mjs --remove",
+    "verify": "node scripts/verify-web-ui.mjs"
+  }
+}
