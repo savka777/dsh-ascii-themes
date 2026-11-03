@@ -1,97 +1,54 @@
-# ASCII Themes
+# ASCII Themes for DeepSeek Harness
 
-A Harness Web UI plugin that paints a full-window ASCII wallpaper and adds a
-floating gallery to switch between nine scenes plus an off switch. Click the palette button in the
-bottom-right corner, pick a card, and the scene changes instantly; the choice is
-remembered in this browser.
+Animated ASCII wallpapers for the DeepSeek Harness desktop app, with a theme
+picker in the bottom-right corner.
 
-![Theme gallery](preview/gallery.png)
+![Demo](docs/demo.gif)
+
+[Full-quality video](docs/demo.mp4)
 
 ## Themes
 
-| Id | Name | What it draws |
-|---|---|---|
-| `whale` | Whale | The DeepSeek whale as a breathing, shimmering ASCII field (default) |
-| `skull` | Toxic Skull | Acid-green pixel skulls drifting through spores and acid rain, one huge ghost skull behind the UI |
-| `peaks` | Azure Peaks | Receding blue mountain ranges with ridgelines, snow caps, valley haze and a still lake |
-| `falls` | Eden Falls | Twin waterfalls between cypress and lush foreground foliage, with pool ripples and mist |
-| `eden` | Eden Orchard | An apple tree, a watcher reaching up, and a serpent winding through the meadow |
-| `valley` | Golden Valley | Warm layered hills, a low sun, light shafts, and wildflowers |
-| `lagoon` | Koi Lagoon | Emerald wave bands, coral koi, fireflies, a moon and its reflection |
-| `jelly` | Neon Jelly | Magenta jellyfish with glowing bells and flowing tentacles in a violet current |
-| `synth` | Synth Sunset | A striped sunset sun, neon ridges, and a scrolling perspective grid |
-| `none` | None | Turns the backdrop off without disabling the theme picker |
+- **Glyph Drift**: a ring of shuffling characters; a wave of glyphs sweeps in and drains away.
+- **Signal Blocks**: blue, cyan and white pixel blocks race round a ring.
+- **Orrery**: pixel-art sun with orbiting rune medallions, moons and embers.
 
-Each scene is drawn from glyphs on a transparent canvas and composited with
-`plus-lighter` in dark mode and `multiply` in light mode, so it reads as a
-wallpaper instead of a veil. The canvas is faded over the sidebar so navigation
-text stays clean, and every scene honors `prefers-reduced-motion` by painting a
-single static frame.
+## Install
 
-## The picker
-
-- Trigger: a 38 px palette button at the bottom-right of the window (present on
-  every page; the overlay keeps `pointer-events: none` except for the controls).
-- Panel: a horizontal gallery with live animated thumbnails, the active card
-  outlined in its accent color; `Esc`, a click outside, or the close button
-  dismisses it.
-- Selection persists in `localStorage` under `dsh.ascii-themes.active`.
-- Theme previews render with supersampling (a small canvas is drawn at 3–4× and
-  downscaled) because 5 px glyphs otherwise fade out in the rasterizer.
-
-Previews from the running app: [whale](preview/app-whale.png) ·
-[skull gallery](preview/gallery-skull.png) · [peaks](preview/app-peaks.png) ·
-[eden](preview/app-eden.png) · [lagoon](preview/app-lagoon.png) ·
-[jelly](preview/app-jelly.png).
-
-## Repo usage
-
-This folder is the canonical checkout — `~/Desktop/dsh-ascii-themes`, a git repo.
-In the Harness workspace, `plugins/dsh-ascii-themes` is a symlink to this folder,
-so agents editing either path change this same copy. Clone it, then:
+You need Node 18+ and DeepSeek Harness Desktop (open it once so its profile exists).
 
 ```sh
-node scripts/build.mjs       # rebuild dist/ and preview.html
-node scripts/install.mjs     # install into ~/.dsh/profiles/desktop (or --profile-dir)
+git clone https://github.com/savka777/dsh-ascii-themes.git
+cd dsh-ascii-themes
+node scripts/install.mjs
 ```
 
-`dist/` is committed so a clone can be installed without building first; rebuild
-after editing `src/`. See [AGENTS.md](AGENTS.md) for the architecture and rules.
+Reload the app window. Click the palette button at the bottom right to pick a theme.
 
-## Layout
+To uninstall: `node scripts/install.mjs --remove`
 
-| Path | Role |
-|---|---|
-| `src/scenes.js` | Scene library and `THEMES` table — the only file needed to add art |
-| `src/renderer.js` | Canvas host: sizing, frame pacing, theme lookup, dark/light, reduced motion, supersampling |
-| `src/client.template.js` | Client bundle: overlay canvas, trigger, gallery, persistence |
-| `src/preview.template.html` | Static gallery preview (`?single=<id>`, `?light`) |
-| `src/whale-mask.txt` | Whale density map used by the `whale` scene |
-| `assets/icon.svg` | Plugin Manager icon |
-| `scripts/build.mjs` | Builds `dist/` and `preview.html` |
-| `scripts/install.mjs` | Links `dist/` into a profile and selects the bundle |
-| `dist/` | Generated installable package |
+## Make your own theme
 
-## Build and install
+1. Add a draw function to `src/scenes.js` and list it in `THEMES`:
 
-```sh
-node scripts/build.mjs
-open preview.html            # gallery; add ?single=synth or ?light
-node scripts/install.mjs     # or install dist/ with Plugin Manager
-```
+   ```js
+   function drawMine(ctx, { t, w, h, cell, dark }) {
+   	setFont(ctx, cell * 2, "center");
+   	ctx.fillStyle = dark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.3)";
+   	ctx.fillText("@", w / 2 + Math.sin(t) * 100, h / 2);
+   }
 
-`node scripts/install.mjs --remove` uninstalls it. A rebuilt `client.js` is
-served on the next page reload; adding a new bundle applies live.
+   // in THEMES:
+   { id: "mine", title: "Mine", accent: "#ffffff", draw: drawMine },
+   ```
 
-## Adding a theme
+2. Build: `node scripts/build.mjs`
+3. Check it in `preview.html?single=mine`, then reload the app.
 
-1. Write a `draw(ctx, env)` scene in `src/scenes.js`. `env` is
-   `{ t, w, h, cell, dark }`; paint with `glyph(ctx, char, x, y, [r,g,b], alpha)`
-   and `setFont(ctx, px, align)`, and scale everything from `Math.min(w, h)` so
-   the same scene works full-screen and as a thumbnail.
-2. Add `{ id, title, accent, draw }` to `THEMES`. Keep alphas low enough that
-   transcript text stays readable, and use `ink(dark)` for light-mode dimming.
-3. `node scripts/build.mjs`, check `preview.html?single=<id>`, reload the app.
+Keep alpha low so chat text stays readable, and size things from
+`Math.min(w, h)` so the scene also works as a small thumbnail.
+[AGENTS.md](AGENTS.md) has the full rules.
 
-The standalone `plugins/dsh-ascii-whale` package is retired in the profile: its
-whale is theme `whale` here, so only one backdrop is active.
+## License
+
+[MIT](LICENSE)

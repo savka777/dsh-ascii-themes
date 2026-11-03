@@ -13,7 +13,7 @@ window.__ModuleLoader__.load({
 		__THEME_RENDERER__
 
 		const STORAGE_KEY = "dsh.ascii-themes.active";
-		const DEFAULT_THEME = "whale";
+		const DEFAULT_THEME = "drift";
 
 		function loadTheme() {
 			try {

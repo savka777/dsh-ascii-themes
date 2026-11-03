@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Choose a vibrant animated ASCII backdrop: whale, toxic skulls, azure peaks, Eden falls or orchard, golden valley, koi, jellyfish, or a neon sunset.",
+  "description": "Choose an animated ASCII backdrop: a drifting glyph ring, signal blocks, or a pixel-art orrery.",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",

@@ -11,7 +11,7 @@
 export function mountScene(canvas, options = {}) {
 	const getTheme = typeof options.getTheme === "function"
 		? options.getTheme
-		: () => options.theme ?? "whale";
+		: () => options.theme ?? THEMES[0].id;
 	const fps = Math.max(1, options.fps ?? 10);
 	const frameInterval = 1000 / fps;
 	// Supersampling: render the scene at `scale` times the CSS resolution and let

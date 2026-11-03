@@ -36,17 +36,20 @@ browser cookie from `$DSH_HOME/.credentials.yaml` and drives headless Chromium.
 
 - Art and metadata live in `src/scenes.js` (`THEMES` array). Each scene is
   `draw(ctx, env)` with `env = { t, w, h, cell, dark }`.
-- Paint with `glyph(ctx, char, x, y, [r,g,b], alpha)` and
-  `setFont(ctx, px, align)`; scale from `Math.min(w, h)` so the scene works both
-  full-window and as a 96 px thumbnail.
+- Paint glyphs with `setFont(ctx, px, align)` and `paintGlyphs(ctx, list, rgb,
+  alpha)`; scale from `Math.min(w, h)` so the scene works both full-window and
+  as a 96 px thumbnail.
 - Dark/light tints: use the `dark` flag (or `ink(dark)` for light-mode dimming).
 - Keep alphas low enough that UI text stays readable; the canvas is faded over
   the sidebar by a CSS mask in `src/client.template.js`.
 - Add `{ id, title, accent, draw }` to `THEMES`, then `node scripts/build.mjs`,
   reload the page, and the card appears in the picker.
-- Scenic depth helper: `makeRidge(...)` builds triangular skyline layers; ridge
-  lines plus diagonal hatching read as mountains. Water/reflection passes are
-  separate horizontal shimmer loops. `paintCloud(...)` is the soft cloud bank.
+- Style (from the `ascii-art` skill): one fixed lattice of tall cells, two tones
+  plus a rare accent that appears only on moving things, and every periodic term
+  a whole number of cycles per scene loop so motion has no seam.
+- Helpers: `noise2` (smooth value noise), `paintGlyphs` (batch one colour of
+  glyphs), and `pixelBuffer` + `pack` for pixel-art scenes like `orrery`, which
+  draw into a small `ImageData` buffer and scale it up without smoothing.
 
 ## Renderer contract (do not break)
 

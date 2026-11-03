@@ -1,7 +1,7 @@
 /**
  * Build the ASCII Themes plugin and its preview gallery.
  *
- * Inlines the scene library, renderer, whale density map, and the client wrapper
+ * Inlines the scene library, renderer, and the client wrapper
  * into one browser bundle, emits a complete plugin package to `dist/`, and writes
  * the static preview page.
  *
@@ -18,21 +18,12 @@ const read = (path) => readFile(join(root, path), "utf8");
 const packageName = "@local/dsh-ascii-themes";
 const rowId = "ascii-themes";
 const title = "ASCII Themes";
-const description = "Choose a vibrant animated ASCII backdrop: whale, toxic skulls, azure peaks, Eden falls or orchard, golden valley, koi, jellyfish, or a neon sunset.";
-
-const maskRows = (await read("src/whale-mask.txt"))
-	.split("\n")
-	.map((line) => line.trim())
-	.filter(Boolean);
-const maskWidth = maskRows[0].length;
-for (const row of maskRows) {
-	if (row.length !== maskWidth || /[^0-9]/.test(row)) throw new Error("malformed whale mask");
-}
+const description = "Choose an animated ASCII backdrop: a drifting glyph ring, signal blocks, or a pixel-art orrery.";
 
 /** Inline a module body as script scope: drop only top-level `export` keywords. */
 const inlineModule = (source) => source.replace(/^export\s+(?=function|class|const|let|var)/gm, "");
 
-const scenes = inlineModule((await read("src/scenes.js")).replace("__WHALE_MASK__", JSON.stringify(maskRows)));
+const scenes = inlineModule(await read("src/scenes.js"));
 const renderer = inlineModule(await read("src/renderer.js"));
 const clientTemplate = await read("src/client.template.js");
 const previewTemplate = await read("src/preview.template.html");
@@ -82,7 +73,7 @@ const localeEn = `${JSON.stringify({ meta: { title, description } }, null, 2)}\n
 const localeZh = `${JSON.stringify({
 	meta: {
 		title: "ASCII 主题",
-		description: "选择动态 ASCII 背景：鲸鱼、毒骷髅、云层、锦鲤、水母或霓虹日落。",
+		description: "选择动态 ASCII 背景：漂移字符环、信号方块或像素星仪。",
 	},
 }, null, 2)}\n`;
 const readme = [
@@ -109,5 +100,5 @@ await Promise.all([
 ]);
 execFileSync(process.execPath, ["--check", join(dist, "client.js")], { stdio: "inherit" });
 
-console.log(`built ${packageName} -> dist/ (${maskWidth}x${maskRows.length} whale mask)`);
+console.log(`built ${packageName} -> dist/`);
 console.log("built preview.html");
